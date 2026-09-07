@@ -15,11 +15,15 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/', getBadges);
-router.get('/:id', getBadgeById);
-router.post('/:id/generate', generateBadge);
+
+// Routes spécifiques AVANT la route générique /:id
 router.get('/:id/pdf', downloadBadgePdf);
+router.post('/:id/generate', generateBadge);
 router.post('/:id/revoke', revokeBadge);
 router.post('/:id/suspend', suspendBadge);
 router.post('/:id/renew', renewBadge);
+
+// Route générique en dernier
+router.get('/:id', getBadgeById);
 
 export default router;

@@ -23,10 +23,11 @@ export const badgeService = {
   },
 
   async downloadPdf(badgeId: string, matricule: string): Promise<void> {
-    const baseUrl = import.meta.env.VITE_API_URL || '/api';
     const token = localStorage.getItem('gc_pita_token');
+    // On utilise le proxy Vite (/api) pour éviter les problèmes CORS
+    const url = `/api/badges/${String(badgeId)}/pdf`;
 
-    const response = await fetch(`${baseUrl}/badges/${String(badgeId)}/pdf`, {
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -34,19 +35,23 @@ export const badgeService = {
     });
 
     if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Erreur ${response.status} : ${errText}`);
+      let errMsg = `Erreur ${response.status}`;
+      try {
+        const errJson = await response.json();
+        errMsg = errJson.message || errMsg;
+      } catch { /* pas de JSON */ }
+      throw new Error(errMsg);
     }
 
     const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
+    const objectUrl = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = url;
+    link.href = objectUrl;
     link.download = `badge-${matricule}.pdf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 2000);
   },
 
   async revoke(badgeId: string, motif: string): Promise<Badge> {
