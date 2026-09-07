@@ -276,7 +276,7 @@ export const BadgePreview = ({ agent, badge, onDownload }: BadgePreviewProps) =>
 
       {/* Actions */}
       <div className="flex justify-center gap-3 pt-2">
-        <Button onClick={onDownload} icon={<Download className="w-4 h-4" />}>
+        <Button onClick={onDownload} loading={false} icon={<Download className="w-4 h-4" />}>
           Télécharger PDF
         </Button>
         <Button variant="outline" onClick={() => window.print()} icon={<Printer className="w-4 h-4" />}>

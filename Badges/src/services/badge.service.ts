@@ -23,11 +23,22 @@ export const badgeService = {
   },
 
   async downloadPdf(badgeId: string, matricule: string): Promise<void> {
-    const response = await api.get(`/badges/${String(badgeId)}/pdf`, {
-      responseType: 'blob',
-      timeout: 120000, // 2 minutes pour la génération PDF
+    const baseUrl = import.meta.env.VITE_API_URL || '/api';
+    const token = localStorage.getItem('gc_pita_token');
+
+    const response = await fetch(`${baseUrl}/badges/${String(badgeId)}/pdf`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
     });
-    const blob = new Blob([response.data], { type: 'application/pdf' });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`Erreur ${response.status} : ${errText}`);
+    }
+
+    const blob = await response.blob();
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -35,7 +46,7 @@ export const badgeService = {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   },
 
   async revoke(badgeId: string, motif: string): Promise<Badge> {

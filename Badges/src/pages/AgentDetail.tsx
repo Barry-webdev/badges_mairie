@@ -40,6 +40,7 @@ export const AgentDetail = () => {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showRevoke, setShowRevoke] = useState(false);
   const [showSuspend, setShowSuspend] = useState(false);
@@ -70,11 +71,21 @@ export const AgentDetail = () => {
   };
 
   const handleDownload = async () => {
-    if (!agent?.badge?._id) return;
+    if (!agent?.badge?._id) {
+      toast.error('Aucun badge trouvé pour cet agent');
+      return;
+    }
+    setPdfLoading(true);
+    const toastId = toast.loading('Génération du PDF en cours...');
     try {
-      await badgeService.downloadPdf(agent.badge._id, agent.matricule);
-      toast.success('PDF téléchargé');
-    } catch { toast.error('Erreur lors du téléchargement'); }
+      await badgeService.downloadPdf(String(agent.badge._id), agent.matricule);
+      toast.success('Badge PDF téléchargé avec succès !', { id: toastId });
+    } catch (err: unknown) {
+      const msg = (err as Error).message || 'Erreur lors du téléchargement';
+      toast.error(msg, { id: toastId });
+    } finally {
+      setPdfLoading(false);
+    }
   };
 
   const handleRevoke = async () => {
@@ -196,8 +207,9 @@ export const AgentDetail = () => {
                   size="sm"
                   icon={<Download className="w-4 h-4" />}
                   onClick={handleDownload}
+                  loading={pdfLoading}
                 >
-                  Télécharger PDF
+                  {pdfLoading ? 'Génération...' : 'Télécharger PDF'}
                 </Button>
                 <Button
                   className="w-full"

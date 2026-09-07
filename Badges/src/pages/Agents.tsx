@@ -105,10 +105,13 @@ export const Agents = () => {
 
   const handleDownload = async (agent: Agent) => {
     if (!agent.badge?._id) { toast.error('Aucun badge à télécharger'); return; }
+    const toastId = toast.loading('Génération du PDF...');
     try {
-      await badgeService.downloadPdf(agent.badge._id, agent.matricule);
-      toast.success('PDF téléchargé');
-    } catch { toast.error('Erreur lors du téléchargement'); }
+      await badgeService.downloadPdf(String(agent.badge._id), agent.matricule);
+      toast.success('Badge PDF téléchargé !', { id: toastId });
+    } catch (err: unknown) {
+      toast.error((err as Error).message || 'Erreur téléchargement', { id: toastId });
+    }
   };
 
   const REVOKE_MOTIFS = [
