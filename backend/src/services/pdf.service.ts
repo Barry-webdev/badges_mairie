@@ -40,12 +40,13 @@ export const generateBadgePdf = async (
 
       // Viewport exact = largeur de la page HTML
       await page.setViewport({ width: PAGE_W, height: CARD_H + 60, deviceScaleFactor: 1 });
-      await page.setContent(html, { waitUntil: 'networkidle0' });
+      // domcontentloaded est plus rapide et suffisant pour du HTML statique avec images base64
+      await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
       // PDF dont les dimensions = contenu réel, pas de marges
       const pdf = await page.pdf({
         width: `${PAGE_W}px`,
-        height: `${CARD_H + 60}px`,   // 60px = labels + padding vertical
+        height: `${CARD_H + 60}px`,
         printBackground: true,
         margin: { top: '0', bottom: '0', left: '0', right: '0' },
       });

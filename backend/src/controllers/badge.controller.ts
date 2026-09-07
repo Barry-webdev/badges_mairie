@@ -138,7 +138,14 @@ export const downloadBadgePdf = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const badge = await Badge.findById(req.params.id);
+    const { id } = req.params;
+
+    // Valider que l'ID est un ObjectId valide
+    if (!id || id.length < 12) {
+      throw createError(`ID badge invalide : ${id}`, 400);
+    }
+
+    const badge = await Badge.findById(id);
     if (!badge) throw createError('Badge non trouvé', 404);
 
     const agent = await Agent.findById(badge.agentId);

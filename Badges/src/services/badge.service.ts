@@ -23,12 +23,18 @@ export const badgeService = {
   },
 
   async downloadPdf(badgeId: string, matricule: string): Promise<void> {
-    const response = await api.get(`/badges/${badgeId}/pdf`, { responseType: 'blob' });
-    const url = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+    const response = await api.get(`/badges/${String(badgeId)}/pdf`, {
+      responseType: 'blob',
+      timeout: 120000, // 2 minutes pour la génération PDF
+    });
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     link.download = `badge-${matricule}.pdf`;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
     URL.revokeObjectURL(url);
   },
 
