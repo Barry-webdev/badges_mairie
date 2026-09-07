@@ -11,10 +11,13 @@ export const connectDatabase = async (): Promise<void> => {
     await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 30000,
       connectTimeoutMS: 30000,
-      socketTimeoutMS: 30000,
+      socketTimeoutMS: 60000,
+      heartbeatFrequencyMS: 10000,
       tls: true,
       tlsAllowInvalidCertificates: true,
       tlsAllowInvalidHostnames: true,
+      maxPoolSize: 10,
+      minPoolSize: 2,
     });
     logger.info(`MongoDB connecté : ${mongoose.connection.host}`);
   } catch (error) {
@@ -27,6 +30,18 @@ export const connectDatabase = async (): Promise<void> => {
   });
 
   mongoose.connection.on('disconnected', () => {
-    logger.warn('MongoDB déconnecté');
+    logger.warn('MongoDB déconnecté — tentative de reconnexion...');
+    setTimeout(() => {
+      mongoose.connect(process.env.MONGODB_URI!, {
+        serverSelectionTimeoutMS: 30000,
+        tls: true,
+        tlsAllowInvalidCertificates: true,
+        tlsAllowInvalidHostnames: true,
+      }).catch((err) => logger.error('Reconnexion MongoDB échouée :', err));
+    }, 5000);
+  });
+
+  mongoose.connection.on('reconnected', () => {
+    logger.info('MongoDB reconnecté avec succès');
   });
 };

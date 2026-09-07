@@ -22,6 +22,7 @@ export const errorHandler = (
     message: process.env.NODE_ENV === 'production' && statusCode === 500
       ? 'Erreur interne du serveur'
       : message,
+    ...(process.env.NODE_ENV !== 'production' && statusCode === 500 && { stack: err.stack }),
   });
 };
 
