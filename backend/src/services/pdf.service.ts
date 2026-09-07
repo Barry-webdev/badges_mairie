@@ -61,15 +61,27 @@ export const generateBadgePdf = async (
 
 function findChromePath(): string | null {
   const candidates = [
+    // Windows — Chrome
     'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
     'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+    // Windows — Edge (Chromium)
+    'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+    'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
+    `C:\\Users\\${process.env.USERNAME || 'User'}\\AppData\\Local\\Microsoft\\Edge\\Application\\msedge.exe`,
+    // Linux
     '/usr/bin/chromium-browser',
     '/usr/bin/chromium',
     '/usr/bin/google-chrome',
+    '/usr/bin/microsoft-edge',
+    // macOS
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
   ];
   for (const c of candidates) {
-    if (fs.existsSync(c)) return c;
+    if (fs.existsSync(c)) {
+      logger.info(`Navigateur trouvé : ${c}`);
+      return c;
+    }
   }
   return null;
 }
