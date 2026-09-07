@@ -65,9 +65,16 @@ export const BadgePreview = ({ agent, badge, onDownload }: BadgePreviewProps) =>
               <img
                 src="/logo.jpeg"
                 alt="Logo Mairie de Pita"
-                style={{ width:30, height:30, objectFit:'contain', borderRadius:3, flexShrink:0 }}
+                style={{
+                  width: 38,
+                  height: 38,
+                  objectFit: 'contain',
+                  borderRadius: 4,
+                  flexShrink: 0,
+                  mixBlendMode: 'lighten' as const,
+                  filter: 'brightness(1.05) contrast(1.1)',
+                }}
                 onError={(e) => {
-                  // Fallback drapeau si logo absent
                   const el = e.currentTarget;
                   el.style.display = 'none';
                   const flag = document.createElement('div');

@@ -343,7 +343,15 @@ function buildBadgeHtml(
 
       <div class="hdr">
         ${logoBase64
-          ? `<img src="${logoBase64}" alt="Logo Mairie" style="width:26px;height:26px;object-fit:contain;border-radius:3px;flex-shrink:0;" />`
+          ? `<img src="${logoBase64}" alt="Logo Mairie" style="
+              width:34px;
+              height:34px;
+              object-fit:contain;
+              border-radius:3px;
+              flex-shrink:0;
+              mix-blend-mode:lighten;
+              filter:brightness(1.05) contrast(1.1);
+             " />`
           : `<div style="display:flex;width:16px;height:26px;border-radius:2px;overflow:hidden;flex-shrink:0;">
                <div style="flex:1;background:#ce1126;"></div>
                <div style="flex:1;background:#fcd116;"></div>
